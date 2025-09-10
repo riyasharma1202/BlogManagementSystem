@@ -1,26 +1,36 @@
 package com.ncu.comment.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-@RequestMapping("/comments")     // means this controller starts with courses
-@RestController                 //this class acts as controller
-public class CommentController 
-{
+import com.ncu.comment.dto.CommentDto;
+import com.ncu.comment.service.CommentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-     /*
-     * http://localhost:9003/comments/
-     */
-    @GetMapping(path = "/")                    //retrieve data
-    public String getAllComments() 
-    {
-        System.out.println("Hello from comment controller!");
-        //_CommentService.getAllComments();
-        return "Hello from comment controller!";
+import java.util.List;
+
+@RestController
+@RequestMapping("/comments")
+public class CommentController {
+
+    private final CommentService commentService;
+
+    @Autowired
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
     }
 
-     
+    @GetMapping("/blog/{blogID}")
+    public List<CommentDto> getCommentsByBlogId(@PathVariable int blogID) {
+        return commentService.getCommentsByBlogId(blogID);
+    }
 
+    @PostMapping("/")
+    public CommentDto addComment(@RequestBody CommentDto dto) {
+        return commentService.addComment(dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteComment(@PathVariable("id") int commentID) {
+        commentService.deleteComment(commentID);
+        return "Comment deleted successfully.";
+    }
 }

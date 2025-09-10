@@ -11,10 +11,10 @@ public class Blog {
 
     }
 
-    public Blog(String blogName, String authId, int blogId){
+    public Blog(String blogName, String authID, int blogID){
         this._BlogName = blogName;
-        this._AuthId = authId;
-        this._BlogId = blogId;
+        this._AuthId = authID;
+        this._BlogId = blogID;
     }
 
     //setters and getter
@@ -23,23 +23,23 @@ public class Blog {
         return _BlogName;
     }
 
-    public void set_BlogName(String blogname) 
+    public void set_BlogName(String blogName) 
     {
-        _BlogName = blogname;
+        _BlogName = blogName;
     }
 
     public String get_AuthId(){
         return _AuthId;
     }
-    public void set_AuthId(String authid){
-        _AuthId = authid;
+    public void set_AuthId(String authID){
+        _AuthId = authID;
     }
 
     public int get_BlogId(){
         return _BlogId;
     }
-    public void set_BlogId(int blogId){
-        _BlogId = blogId;
+    public void set_BlogId(int blogID){
+        _BlogId = blogID;
     }
 
 

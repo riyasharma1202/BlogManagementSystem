@@ -7,12 +7,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
-        <relativePath/> <!-- lookup parent from repository ...whichever dependency we will add later like hibernate jdbc it will itself look at compatible version for those dependencies --> 
+        <version>3.5.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.ncu.commentservice</groupId>    <!-- unique in universe-->
-    <artifactId>commentservice</artifactId>      <!-- unique in project-->
+    <groupId>com.ncu.library</groupId>
+    <artifactId>commentservice</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -20,11 +20,16 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <java.version>17</java.version>
+     <spring-cloud.version>2025.0.0</spring-cloud.version>
+
     </properties>
 
     <dependencies>
-
-    <dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+      <dependency>
         <groupId>com.mysql</groupId>
         <artifactId>mysql-connector-j</artifactId>
         <scope>runtime</scope>
@@ -38,10 +43,22 @@
         <artifactId>modelmapper</artifactId>
         <version>3.1.1</version>
       </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      </dependency>
     </dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+  
 </project>

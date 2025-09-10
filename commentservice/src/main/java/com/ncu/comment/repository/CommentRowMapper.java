@@ -1,20 +1,18 @@
 package com.ncu.comment.repository;
-
+import com.ncu.comment.*;
 import com.ncu.comment.model.Comment;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.springframework.jdbc.core.RowMapper;
 
 public class CommentRowMapper implements RowMapper<Comment> {
-
     @Override
     public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Comment comment = new Comment();
-        comment.setCommentId(rs.getInt("comment_id"));
-        comment.setContent(rs.getString("content"));
-        comment.setAuthId(rs.getString("auth_id"));
-        comment.setBlogId(rs.getInt("blog_id"));
-        return comment;
+        String commenterName = rs.getString("commenterName");
+        String content = rs.getString("content");
+        int blogID = rs.getInt("blogID");
+        int commentID = rs.getInt("commentID");
+        return new Comment(commenterName, content, blogID, commentID);
     }
 }

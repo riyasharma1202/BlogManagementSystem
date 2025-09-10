@@ -4,21 +4,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlogDto {
     
-    @JsonProperty("blogname")
+    @JsonProperty("blogName")
     String _BlogName;
 
-    @JsonProperty("authid")
+    @JsonProperty("authID")
     String _AuthId;
 
-        BlogDto() 
+    BlogDto() 
     {
 
     }
 
-    public BlogDto(String blogName, String authid) 
+    public BlogDto(String blogName, String authID) 
     {
         _BlogName = blogName;
-        _AuthId = authid;
+        _AuthId = authID;
     }
 
     public String get_BlogName() 
@@ -26,15 +26,15 @@ public class BlogDto {
         return _BlogName;
     }
 
-    public void set_BlogName(String blogname) 
+    public void set_BlogName(String blogName) 
     {
-        _BlogName = blogname;
+        _BlogName = blogName;
     }
 
     public String get_AuthId(){
         return _AuthId;
     }
-    public void set_AuthId(String authid){
-        _AuthId = authid;
+    public void set_AuthId(String authID){
+        _AuthId = authID;
     }
 }

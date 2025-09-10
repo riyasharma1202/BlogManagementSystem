@@ -1,35 +1,39 @@
 package com.ncu.comment.dto;
 
 public class CommentDto {
+    private String commenterName;
     private String content;
-    private String authId;
-    private int blogId;
+    private int blogID;
 
-    // Getters and Setters
-    public String getContent() 
-    { 
-        return content; 
-    }
-    public void setContent(String content) 
-    { 
-        this.content = content; 
+    public CommentDto() {}
+
+    public CommentDto(String commenterName, String content, int blogID) {
+        this.commenterName = commenterName;
+        this.content = content;
+        this.blogID = blogID;
     }
 
-    public String getAuthId() 
-    { 
-        return authId; 
-    }
-    public void setAuthId(String authId) 
-    { 
-        this.authId = authId; 
+    public String getCommenterName() {
+        return commenterName;
     }
 
-    public int getBlogId() 
-    { 
-        return blogId; 
+    public void setCommenterName(String commenterName) {
+        this.commenterName = commenterName;
     }
-    public void setBlogId(int blogId) 
-    { 
-        this.blogId = blogId; 
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public int getBlogID() {
+        return blogID;
+    }
+
+    public void setBlogID(int blogID) {
+        this.blogID = blogID;
     }
 }

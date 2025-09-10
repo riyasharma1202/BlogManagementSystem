@@ -9,7 +9,7 @@ import com.ncu.blog.model.Blog;
 
 public class BlogRowMapper implements RowMapper<Blog>{
     
-     @Override
+    @Override
     public Blog mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         if(rs == null)
@@ -17,9 +17,9 @@ public class BlogRowMapper implements RowMapper<Blog>{
             return null;
         }
 
-        String blogName = rs.getString("b_name");
-        String authId  = rs.getString("authname");
-        int blogId = rs.getInt("b_id");
-        return new Blog(blogName, authId, blogId);
+        String blogName = rs.getString("blogName");
+        String authID  = rs.getString("authID");
+        int blogID = rs.getInt("blogID");
+        return new Blog(blogName, authID, blogID);
     }
 }

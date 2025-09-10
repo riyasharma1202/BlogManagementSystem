@@ -1,45 +1,49 @@
 package com.ncu.comment.model;
 
 public class Comment {
-    private int commentId;
+    private int commentID;
+    private int blogID;
+    private String commenterName;
     private String content;
-    private String authId;
-    private int blogId;
 
-    // Getters and Setters
-    public int getCommentId()
-     { 
-        return commentId; 
-    }
-    public void setCommentId(int commentId)
-     { 
-        this.commentId = commentId;
-     }
+    public Comment() {}
 
-    public String getContent()
-     {
-         return content; 
-    }
-    public void setContent(String content) 
-    { 
-        this.content = content; 
+    public Comment(String commenterName, String content, int blogID, int commentID) {
+        this.commenterName = commenterName;
+        this.content = content;
+        this.blogID = blogID;
+        this.commentID = commentID;
     }
 
-    public String getAuthId() 
-    {
-         return authId; 
-    }
-    public void setAuthId(String authId) 
-    { 
-        this.authId = authId; 
+    public int getCommentID() {
+        return commentID;
     }
 
-    public int getBlogId() 
-    { 
-        return blogId; 
+    public void setCommentID(int commentID) {
+        this.commentID = commentID;
     }
-    public void setBlogId(int blogId) 
-    { 
-        this.blogId = blogId; 
+
+    public int getBlogID() {
+        return blogID;
+    }
+
+    public void setBlogID(int blogID) {
+        this.blogID = blogID;
+    }
+
+    public String getCommenterName() {
+        return commenterName;
+    }
+
+    public void setCommenterName(String commenterName) {
+        this.commenterName = commenterName;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

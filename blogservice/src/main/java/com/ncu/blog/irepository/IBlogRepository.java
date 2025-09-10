@@ -5,16 +5,12 @@ import com.ncu.blog.model.Blog;
 
 public interface IBlogRepository {
 
-    
+    public List<Blog> getAllBlogs();
+    Blog getBlogById(int blogID);
+    List<Blog> getBlogsByAuthorId(String authID);
+
     Blog addBlog(Blog blog);
-    
-    Blog getBlogById(int blogId);
-    List<Blog> getBlogsByAuthorId(String authorId);
 
-    void deleteBlog(int blogId);
-
-    String getBlogNameById(int blogId);
-    long countBlogsByAuthorId(String authorId);
-
+    void deleteBlog(int blogID);
     
 }

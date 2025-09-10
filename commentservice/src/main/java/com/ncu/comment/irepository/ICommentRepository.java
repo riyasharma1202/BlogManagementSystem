@@ -1,14 +1,15 @@
 package com.ncu.comment.irepository;
 
-import com.ncu.comment.model.Comment;
 import java.util.List;
 
+import com.ncu.comment.model.Comment;
+
 public interface ICommentRepository {
+
+    List<Comment> getCommentsByBlogId(int blogID);
+
     Comment addComment(Comment comment);
-    Comment getCommentById(int commentId);
-    List<Comment> getCommentsByBlogId(int blogId);
-    List<Comment> getCommentsByAuthId(String authId);
-    void deleteComment(int commentId);
-    long countCommentsByBlogId(int blogId);
+
+    void deleteComment(int commentID);
 }
 
