@@ -1,81 +1,104 @@
 package com.ncu.blog.service;
 
+import com.ncu.blog.dto.*;
+import com.ncu.blog.service.exceptions.*;
+import com.ncu.blog.irepository.IBlogRepository;
+import com.ncu.blog.model.Blog;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ncu.blog.dto.*;
-import com.ncu.blog.irepository.*;
-import com.ncu.blog.model.Blog;
-
-import org.modelmapper.ModelMapper;
-
-@Service(value = "BlogService")
+@Service
 public class BlogService {
 
-    private final IBlogRepository _BlogRepository;
-    private final ModelMapper _ModelMapper;
-    private final RestClient commentRestClient;
+    private final IBlogRepository blogRepository;
+    private final ModelMapper modelMapper;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public BlogService(IBlogRepository blogRepository,
-                       ModelMapper modelMapper,
-                       RestClient commentRestClient) {
-        this._BlogRepository = blogRepository;
-        this._ModelMapper = modelMapper;
-        this.commentRestClient = commentRestClient;
+    public BlogService(IBlogRepository blogRepository, ModelMapper modelMapper, RestTemplate restTemplate) {
+        this.blogRepository = blogRepository;
+        this.modelMapper = modelMapper;
+        this.restTemplate = restTemplate;
     }
 
     public List<BlogDto> getAllBlogs() {
-        List<Blog> blogs = _BlogRepository.getAllBlogs();
-        List<BlogDto> blogDtos = new ArrayList<>();
-        for (Blog b : blogs) {
-            BlogDto dto = _ModelMapper.map(b, BlogDto.class);
-            blogDtos.add(dto);
+        try {
+            List<Blog> blogs = blogRepository.getAllBlogs();
+            List<BlogDto> dtos = new ArrayList<>();
+            for (Blog b : blogs) dtos.add(modelMapper.map(b, BlogDto.class));
+            return dtos;
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to fetch blogs: " + e.getMessage());
         }
-        return blogDtos;
     }
 
     public BlogDto getBlogById(int blogId) {
-        Blog blog = _BlogRepository.getBlogById(blogId);
-        if (blog == null) return null;
-        return _ModelMapper.map(blog, BlogDto.class);
+        if (blogId <= 0) throw new ValidationException("Invalid blog ID");
+        Blog blog = blogRepository.getBlogById(blogId);
+        if (blog == null) throw new BlogNotFoundException("Blog not found with ID: " + blogId);
+        return modelMapper.map(blog, BlogDto.class);
     }
 
     public List<BlogDto> getBlogsByAuthorId(String authID) {
-        List<Blog> blogs = _BlogRepository.getBlogsByAuthorId(authID);
-        List<BlogDto> blogDtos = new ArrayList<>();
-        for (Blog b : blogs) {
-            blogDtos.add(_ModelMapper.map(b, BlogDto.class));
+        if (authID == null || authID.isBlank()) throw new ValidationException("Author ID cannot be empty");
+        try {
+            List<Blog> blogs = blogRepository.getBlogsByAuthorId(authID);
+            List<BlogDto> dtos = new ArrayList<>();
+            for (Blog b : blogs) dtos.add(modelMapper.map(b, BlogDto.class));
+            return dtos;
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to fetch blogs by author: " + e.getMessage());
         }
-        return blogDtos;
     }
 
     public BlogDto addBlog(BlogDto blogDto) {
-        Blog blog = _ModelMapper.map(blogDto, Blog.class);
-        Blog savedBlog = _BlogRepository.addBlog(blog);
-        return _ModelMapper.map(savedBlog, BlogDto.class);
+        if (blogDto == null || blogDto.get_BlogName() == null || blogDto.get_BlogName().isBlank()) {
+            throw new ValidationException("Blog name is required");
+        }
+        try {
+            Blog blog = modelMapper.map(blogDto, Blog.class);
+            Blog saved = blogRepository.addBlog(blog);
+            return modelMapper.map(saved, BlogDto.class);
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to add blog: " + e.getMessage());
+        }
     }
 
     public void deleteBlog(int blogId) {
-        _BlogRepository.deleteBlog(blogId);
+        if (blogId <= 0) throw new ValidationException("Invalid blog ID");
+        try {
+            blogRepository.deleteBlog(blogId);
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to delete blog: " + e.getMessage());
+        }
     }
 
-    // Fetch comments from CommentService
     public List<CommentDto> getCommentsForBlog(int blogID) {
-        return commentRestClient.get()
-            .uri("/blog/{id}", blogID)
-            .retrieve()
-            .body(new ParameterizedTypeReference<List<CommentDto>>() {});
+        try {
+            String url = "http://localhost:9003/comments/blog/" + blogID; // Comment service base; configserver/eureka can be used to look up
+            ResponseEntity<CommentDto[]> resp = restTemplate.getForEntity(url, CommentDto[].class);
+            if (resp.getStatusCode().is2xxSuccessful() && resp.getBody() != null) {
+                CommentDto[] arr = resp.getBody();
+                List<CommentDto> list = new ArrayList<>();
+                for (CommentDto c : arr) list.add(c);
+                return list;
+            } else {
+                return new ArrayList<>();
+            }
+        } catch (RestClientException ex) {
+            throw new ExternalServiceException("Comment service unavailable: " + ex.getMessage());
+        }
     }
 
-    //Combine blog + comments
     public BlogWithCommentsDto getBlogWithComments(int blogID) {
-        BlogDto blog = getBlogById(blogID);
+        BlogDto blog = getBlogById(blogID); // throws if not found
         List<CommentDto> comments = getCommentsForBlog(blogID);
         return new BlogWithCommentsDto(blog, comments);
     }

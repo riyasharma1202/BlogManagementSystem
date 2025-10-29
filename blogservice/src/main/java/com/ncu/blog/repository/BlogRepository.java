@@ -4,92 +4,74 @@ import com.ncu.blog.irepository.IBlogRepository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import com.ncu.blog.model.Blog;
 
 @Repository(value = "BlogRepository")
 public class BlogRepository implements IBlogRepository {
-     
-    JdbcTemplate _JdbcTemplate ;
-    
+
+    private final JdbcTemplate jdbcTemplate;
+
     @Autowired
-    BlogRepository(JdbcTemplate jdbcTemplate){
-        this._JdbcTemplate = jdbcTemplate;
+    public BlogRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
+    public List<Blog> getAllBlogs() {
+        String sql = "SELECT * FROM blogdb.blog";
 
-     @Override
-     public List<Blog> getAllBlogs(){
+        return jdbcTemplate.query(sql, new BlogRowMapper());
+    }
 
-        List<Blog> blogs;
-        String sql = "select * from blogdb.blog";
+    @Override
+    public Blog getBlogById(int blogID) {
+        String sql = "SELECT * FROM blogdb.blog WHERE blogID = ?";
 
         try {
-            blogs = _JdbcTemplate.query(sql, new BlogRowMapper());
-        } catch (Exception e) {
-            System.out.println("Error fetching blogs : " + e.getMessage());
-            return null;
+            return jdbcTemplate.queryForObject(sql, new BlogRowMapper(), blogID);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RuntimeException("Blog not found with ID: " + blogID);
         }
-        return blogs;
-     }
-
-
-     @Override
-public Blog getBlogById(int blogID) {
-    String sql = "SELECT * FROM blogdb.blog WHERE id = ?";
-    try {
-        return _JdbcTemplate.queryForObject(sql, new BlogRowMapper(), blogID);
-    } catch (EmptyResultDataAccessException e) {
-        System.out.println("No blog found with ID: " + blogID);
-        return null;
-    } catch (Exception e) {
-        System.out.println("Error fetching blog by ID: " + e.getMessage());
-        return null;
     }
-}
 
-@Override
-public List<Blog> getBlogsByAuthorId(String authID) {
-    String sql = "SELECT * FROM blogdb.blog WHERE author_id = ?";
-    try {
-        return _JdbcTemplate.query(sql, new BlogRowMapper(), authID);
-    } catch (Exception e) {
-        System.out.println("Error fetching blogs by author ID: " + e.getMessage());
-        return new ArrayList<>();
+    @Override
+    public List<Blog> getBlogsByAuthorId(String authID) {
+        String sql = "SELECT * FROM blogdb.blog WHERE authID = ?";
+        return jdbcTemplate.query(sql, new BlogRowMapper(), authID);
     }
-}
 
-@Override
-public Blog addBlog(Blog blog) {
-    String sql = "INSERT INTO blogdb.blog (title, content, author_id) VALUES (?, ?, ?)";
-    try {
-        int rowsAffected = _JdbcTemplate.update(sql, blog.get_BlogName(), blog.get_BlogId(), blog.get_AuthId());
+    @Override
+    public Blog addBlog(Blog blog) {
+        String sql = "INSERT INTO blogdb.blog (blogName, authID, blogID) VALUES (?, ?, ?)";
+
+        int rowsAffected = jdbcTemplate.update(sql, blog.get_BlogName(), blog.get_AuthId(), blog.get_BlogId());
+
         if (rowsAffected > 0) {
-            // Optionally fetch the inserted blog (if you have auto-generated ID logic)
             return blog;
         }
-    } catch (Exception e) {
-        System.out.println("Error adding blog: " + e.getMessage());
+        throw new RuntimeException("Failed to insert Blog into database");
     }
-    return null;
+
+    @Override
+    public void deleteBlog(int blogID) {
+        String sql = "DELETE FROM blogdb.blog WHERE blogID = ?";
+        int rowsAffected = jdbcTemplate.update(sql, blogID);
+
+        if (rowsAffected == 0) {
+            throw new RuntimeException("No blog found to delete with ID: " + blogID);
+        }
+    }
 }
 
-@Override
-public void deleteBlog(int blogID) {
-    String sql = "DELETE FROM blogdb.blog WHERE id = ?";
-    try {
-        _JdbcTemplate.update(sql, blogID);
-    } catch (Exception e) {
-        System.out.println("Error deleting blog: " + e.getMessage());
-    }
-}
-}
 
 
 

@@ -1,73 +1,56 @@
 package com.ncu.blog.controller;
 
+import com.ncu.blog.dto.ApiResponse;
+import com.ncu.blog.dto.BlogDto;
+import com.ncu.blog.dto.BlogWithCommentsDto;
+import com.ncu.blog.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import com.ncu.blog.dto.*;
-import com.ncu.blog.model.Blog;
-import com.ncu.blog.service.*;
 
-@RequestMapping("/blogs")     // means this controller starts with courses
-@RestController                 //this class acts as controller
-public class BlogController 
-{
+@RequestMapping("/blogs")
+@RestController
+public class BlogController {
 
-    private final BlogService _BlogService;
+    private final BlogService blogService;
 
     @Autowired
-    public BlogController(BlogService blogService){
-        this._BlogService = blogService;
-    }
-     /*
-     * http://localhost:9002/blogs/allblogs
-     */
-    @GetMapping(path = "/allblogs")                    //retrieve data
-    public List<BlogDto> getAllBlogs() 
-    {
-        return _BlogService.getAllBlogs();
+    public BlogController(BlogService blogService) { this.blogService = blogService; }
+
+    @GetMapping("/allblogs")
+    public ResponseEntity<ApiResponse<List<BlogDto>>> getAllBlogs() {
+        List<BlogDto> dtos = blogService.getAllBlogs();
+        return ResponseEntity.ok(ApiResponse.success(dtos));
     }
 
-       // GET blog by ID
     @GetMapping("/{id}")
-    public BlogDto getBlogById(@PathVariable("id") int blogID) {
-        return _BlogService.getBlogById(blogID);
+    public ResponseEntity<ApiResponse<BlogDto>> getBlogById(@PathVariable int id) {
+        BlogDto dto = blogService.getBlogById(id);
+        return ResponseEntity.ok(ApiResponse.success(dto));
     }
 
-    // GET blogs by author ID
     @GetMapping("/author/{authId}")
-    public List<BlogDto> getBlogsByAuthorId(@PathVariable("authId") String authID) {
-        return _BlogService.getBlogsByAuthorId(authID);
+    public ResponseEntity<ApiResponse<List<BlogDto>>> getBlogsByAuthorId(@PathVariable String authId) {
+        List<BlogDto> list = blogService.getBlogsByAuthorId(authId);
+        return ResponseEntity.ok(ApiResponse.success(list));
     }
 
-    // POST a new blog
     @PostMapping("/")
-    public BlogDto addBlog(@RequestBody BlogDto blogDto) {
-        return _BlogService.addBlog(blogDto); // Service handles mapping
+    public ResponseEntity<ApiResponse<BlogDto>> addBlog(@RequestBody BlogDto blogDto) {
+        BlogDto saved = blogService.addBlog(blogDto);
+        return ResponseEntity.ok(ApiResponse.success(saved));
     }
 
-    // DELETE a blog by ID
     @DeleteMapping("/{id}")
-    public String deleteBlog(@PathVariable("id") int blogID) {
-        _BlogService.deleteBlog(blogID);
-        return "Blog deleted successfully.";
+    public ResponseEntity<ApiResponse<String>> deleteBlog(@PathVariable int id) {
+        blogService.deleteBlog(id);
+        return ResponseEntity.ok(ApiResponse.success("Blog deleted successfully"));
     }
 
     @GetMapping("/with-comments/{id}")
-    public BlogWithCommentsDto getBlogWithComments(@PathVariable("id") int blogID) {
-    return _BlogService.getBlogWithComments(blogID);
-}
-
-   
-
-    
-
+    public ResponseEntity<ApiResponse<BlogWithCommentsDto>> getBlogWithComments(@PathVariable int id) {
+        BlogWithCommentsDto combined = blogService.getBlogWithComments(id);
+        return ResponseEntity.ok(ApiResponse.success(combined));
+    }
 }
